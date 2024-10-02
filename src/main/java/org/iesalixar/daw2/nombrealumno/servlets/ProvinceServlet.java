@@ -7,7 +7,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.iesalixar.daw2.nombrealumno.dao.ProvinceDAO;
 import org.iesalixar.daw2.nombrealumno.dao.ProvinceDAOImpl;
+import org.iesalixar.daw2.nombrealumno.dao.RegionDAO;
+import org.iesalixar.daw2.nombrealumno.dao.RegionDAOImpl;
 import org.iesalixar.daw2.nombrealumno.entity.Province;
+import org.iesalixar.daw2.nombrealumno.entity.Region;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -17,11 +20,13 @@ import java.util.List;
 public class ProvinceServlet extends HttpServlet {
 
     private ProvinceDAO provinceDAO;
+    private RegionDAO regionDAO;
 
     @Override
     public void init() throws ServletException {
         try{
             provinceDAO = new ProvinceDAOImpl();
+            regionDAO = new RegionDAOImpl();
         } catch (Exception e) {
             throw new ServletException("Error al inicializar el ProvinceDAO", e);
         }
@@ -39,6 +44,7 @@ public class ProvinceServlet extends HttpServlet {
 
             switch (action) {
                 case "new":
+                    showNewForm(request, response);
                     break;
                 case "edit":
                     break;
@@ -55,6 +61,13 @@ public class ProvinceServlet extends HttpServlet {
         List<Province> listProvinces = provinceDAO.listAllProvinces();
         request.setAttribute("listProvinces", listProvinces);
         request.getRequestDispatcher("province.jsp").forward(request, response); // Redirigir a la página JSP
+    }
+
+    private void showNewForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        List<Region> listRegions = regionDAO.listAllRegions();
+        request.setAttribute("listRegions", listRegions);
+        request.getRequestDispatcher("province-form.jsp").forward(request, response); // Redirige a la vista para nueva región
     }
 
 }

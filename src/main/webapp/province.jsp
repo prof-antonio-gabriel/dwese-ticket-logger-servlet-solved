@@ -2,6 +2,8 @@
 
 <h1>Listado de Provincias</h1>
 
+<a href="provinces?action=new">Añadir Provincia</a>
+
 <table border="1">
     <thead>
         <th>ID</th>
