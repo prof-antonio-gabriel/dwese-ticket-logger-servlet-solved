@@ -20,7 +20,8 @@
         <label for="name">Nombre:</label>
         <input type="text" name="name" id="name" value="${province != null ? province.name : ''}" required />
 
-        <select name="id_region">
+        <label for="id_region">Comunidad Autonoma: </label>
+        <select id="id_region" name="id_region">
             <option value=""></option>
             <c:forEach var="region" items="${listRegions}">
                 <option value="${region.id}">${region.name}</option>
