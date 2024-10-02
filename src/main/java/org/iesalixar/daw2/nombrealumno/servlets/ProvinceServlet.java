@@ -57,6 +57,27 @@ public class ProvinceServlet extends HttpServlet {
         }
     }
 
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String action = request.getParameter("action");
+        try {
+            switch (action) {
+                case "insert":
+                    insertProvince(request, response);  // Insertar nueva región
+                    break;
+                case "update":
+                    break;
+                case "delete":
+                    break;
+                default:
+                    listProvinces(request, response);   // Listar todas las regiones
+                    break;
+            }
+        } catch (SQLException ex) {
+            throw new ServletException(ex);
+        }
+    }
+
     private void listProvinces(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         List<Province> listProvinces = provinceDAO.listAllProvinces();
         request.setAttribute("listProvinces", listProvinces);
@@ -68,6 +89,47 @@ public class ProvinceServlet extends HttpServlet {
         List<Region> listRegions = regionDAO.listAllRegions();
         request.setAttribute("listRegions", listRegions);
         request.getRequestDispatcher("province-form.jsp").forward(request, response); // Redirige a la vista para nueva región
+    }
+
+    private void insertProvince(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        String code = request.getParameter("code");
+        String name = request.getParameter("name");
+        String id_region = request.getParameter("id_region");
+
+        // Validaciones básicas
+        if (code.isEmpty() || name.isEmpty() || id_region.isEmpty()) {
+            request.setAttribute("errorMessage", "El código y el nombre y la comunidad autonoma no pueden estar vacíos.");
+            request.getRequestDispatcher("province-form.jsp").forward(request, response);
+            return;
+        }
+
+        // Validar si el código ya existe ignorando mayúsculas
+        if (provinceDAO.existsProvinceByCode(code)) {
+            request.setAttribute("errorMessage", "El código de la provincia ya existe.");
+            request.getRequestDispatcher("province-form.jsp").forward(request, response);
+            return;
+        }
+
+        Province province = new Province();
+        province.setCode(code);
+        province.setName(name);
+
+        Region region = regionDAO.getRegionById(Integer.parseInt(id_region));
+        province.setRegion(region);
+
+        try{
+            provinceDAO.insertProvince(province);
+        } catch (SQLException e) {
+            if (e.getSQLState().equals("23505")) { // Código SQL para unique constraint violation
+                request.setAttribute("errorMessage", "El código de la provincia debe ser único.");
+                request.getRequestDispatcher("province-form.jsp").forward(request, response);
+            } else {
+                throw e;
+            }
+        }
+        response.sendRedirect("provinces");
+
     }
 
 }

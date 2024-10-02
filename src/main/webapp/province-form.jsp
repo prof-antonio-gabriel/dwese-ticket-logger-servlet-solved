@@ -10,6 +10,11 @@
         </c:otherwise>
     </c:choose>
 
+    <%-- Mostrar mensaje de error si existe --%>
+    <c:if test="${not empty errorMessage}">
+        <div class="error-message">${errorMessage}</div>
+    </c:if>
+
     <form action="provinces" method="post">
         <input type="hidden" name="id" value="${province != null ? province.id : ''}" />
         <input type="hidden" name="action" value="${province == null ? 'insert' : 'update'}" />
